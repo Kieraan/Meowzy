@@ -32,6 +32,7 @@ public class Meowzy extends PircBot {
         //this.commands.add(new MeowzyCommand(this));
         //this.commands.add(new AliasCommand(this));
         this.commands.add(new NoteCommand(this));
+        this.commands.add(new ServersCommand(this));
     }
 
     public void onConnect() {
@@ -126,8 +127,8 @@ public class Meowzy extends PircBot {
                 channel = channel.replace("ChanServ!ChanServ@Services.GameSurge.net INVITE Meowzy ", "");
             }
             Log.consoleLog("Invite", "Being invited to " + channel + " by " + sourceNick + " (" + sourceLogin + "@" + sourceHostname + ")");
-            if(sourceHostname.equalsIgnoreCase("irc.kieraan.co.uk") || channel.contains("#j2dev")) {
-                Log.consoleLog("Invite", "Accepting invite");
+            if(sourceHostname.equalsIgnoreCase("irc.kieraan.co.uk") || sourceNick.equalsIgnoreCase("ChanServ")) {
+                Log.consoleLog("Invite", "Accepting " + sourceNick + "'s invite to " + channel);
                 joinChannel(channel);
             }
         }
