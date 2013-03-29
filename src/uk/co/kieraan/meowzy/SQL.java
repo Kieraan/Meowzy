@@ -68,25 +68,27 @@ public class SQL {
         
         try {
             statement = connection.createStatement();
-            ResultSet results = statement.executeQuery("SELECT * FROM notes WHERE receiver = '" + sender + "' AND channel = '" + channel + "';");
-            while(results.next()) {
+            Statement deleteStatement = connection.createStatement();
+            ResultSet results = statement.executeQuery("SELECT * FROM notes WHERE receiver = '" + sender + "';"); // AND channel = '" + channel + "'
+            String finalMessage = "";
+            while (results.next()){
                 if (sender.equalsIgnoreCase(results.getString("receiver"))) {
     
                     if (!noteSent) {
-                        bot.sendMessage(channel, sender + ", you have notes!");
-                        Log.consoleLog("Giving " + sender + " their note.");
+                        finalMessage += sender + ", you have notes: ";
+                        Log.consoleLog("Giving " + sender + " their notes.");
                         noteSent = true;
                     }
-    
+                    // This is probably stupid but woo who cares :D
                     String message_toSend = results.getString("message").toString().replace("<BACKSLASH>", "\\").replace("<APOSTROPHE>", "'");
-    
-                    this.bot.sendMessage(channel, "<" + results.getString("sender") + "> " + message_toSend);
-                    statement.executeUpdate("DELETE FROM notes WHERE message = '" + results.getString("message") + "' AND channel = '" + channel + "'");
+                    finalMessage += "<" + results.getString("sender") + "> " + message_toSend + "  ";
                     
-                    for (int i = 0; i < results.getFetchSize(); i++) {
-                        results.next();
-                    }
+                    deleteStatement.executeUpdate("DELETE FROM notes WHERE message = '" + results.getString("message") + "' AND channel = '" + channel + "'");
+
                 }
+            }
+            if(noteSent) {
+                this.bot.sendMessage(channel, finalMessage);
             }
         } catch (SQLException e) {
             Log.consoleLog("Error", "Failed to check for notes.");
@@ -116,6 +118,7 @@ public class SQL {
         
         sqlConnect();
         
+        // This is probably stupid but woo who cares :D
         String noteToDB = Util.combineSplit(2, split, " ").replace("'", "<APOSTROPHE>").replace("\\", "<BACKSLASH>");
         Statement statement;
         
